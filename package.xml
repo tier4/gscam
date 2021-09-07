@@ -15,7 +15,7 @@
   <author email="tjay@cs.brown.edu">Graylin Trevor Jay</author>
   <author email="chriscrick@cs.brown.edu">Christopher Crick</author>
 
-  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
   <depend>libgstreamer1.0-dev</depend>
   <depend>libgstreamer-plugins-base1.0-dev</depend>
@@ -33,6 +33,4 @@
     <build_type>ament_cmake</build_type>
   </export>
 
-
 </package>
-

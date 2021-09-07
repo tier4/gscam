@@ -19,71 +19,32 @@ else()
   pkg_check_modules(GST_APP REQUIRED gstreamer-app-0.10)
 endif()
 
-find_package(ament_cmake REQUIRED)
-find_package(class_loader REQUIRED)
-find_package(image_transport REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(rclcpp_components REQUIRED)
-find_package(sensor_msgs REQUIRED)
-find_package(camera_calibration_parsers REQUIRED)
-find_package(camera_info_manager REQUIRED)
+find_package(ament_cmake_auto REQUIRED)
+ament_auto_find_build_dependencies()
 
-include_directories(
-  include
-  ${GLIB_INCLUDE_DIRS}
-  ${GST_APP_INCLUDE_DIRS})
+ament_auto_add_library(gscam SHARED
+  src/gscam.cpp
+)
 
-add_library(gscam SHARED src/gscam.cpp)
+target_include_directories(gscam
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+    ${GLIB_INCLUDE_DIRS}
+    ${GST_APP_INCLUDE_DIRS}
+)
+
 target_link_libraries(gscam
-  ${ament_LIBRARIES}
   ${GSTREAMER_LIBRARIES}
-  ${GST_APP_LIBRARIES})
-ament_target_dependencies(gscam
-  "class_loader"
-  "image_transport"
-  "rclcpp"
-  "rclcpp_components"
-  "sensor_msgs"
-  "camera_calibration_parsers"
-  "camera_info_manager")
-rclcpp_components_register_nodes(gscam "gscam::GSCam")
-set(node_plugins "${node_plugins}gscam::GSCam;$<TARGET_FILE:gscam>\n")
+  ${GST_APP_LIBRARIES}
+)
 
-add_executable(gscam_node src/gscam_node.cpp)
-target_link_libraries(gscam_node gscam
-  ${ament_LIBRARIES}
-  ${GSTREAMER_LIBRARIES}
-  ${GST_APP_LIBRARIES})
-set_target_properties(gscam_node PROPERTIES OUTPUT_NAME gscam)
+rclcpp_components_register_node(gscam
+  PLUGIN "gscam::GSCam"
+  EXECUTABLE gscam_node
+)
 
-ament_export_dependencies(class_loader)
-
-ament_export_include_directories(include)
-
-ament_export_interfaces(export_gscam)
-
-ament_export_libraries(gscam)
-
-ament_package()
-
-# Install directives
-
-install(TARGETS gscam
-  EXPORT export_gscam
-  DESTINATION lib
-  )
-
-install(TARGETS gscam_node
-  DESTINATION lib/gscam
-  )
-
-install(FILES
-  examples/v4l.launch
-  examples/gscam_nodelet.launch
-  examples/nodelet_pipeline.launch
-  DESTINATION share/gscam/launch
-  )
-
-install(FILES examples/uncalibrated_parameters.ini
-  DESTINATION share/gscam/examples
-  )
+ament_auto_package(
+  INSTALL_TO_SHARE
+    examples
+)
