@@ -238,10 +238,13 @@ namespace gscam {
 
     // Create ROS camera interface
     if (image_encoding_ == "jpeg") {
-        jpeg_pub_ = create_publisher<sensor_msgs::msg::CompressedImage>("camera/image_raw/compressed",1);
-        cinfo_pub_ = create_publisher<sensor_msgs::msg::CameraInfo>("camera/camera_info",1);
+        jpeg_pub_ = create_publisher<sensor_msgs::msg::CompressedImage>("camera/image_raw/compressed",
+          rclcpp::SensorDataQoS().keep_last(1));
+        cinfo_pub_ = create_publisher<sensor_msgs::msg::CameraInfo>("camera/camera_info",
+          rclcpp::SensorDataQoS().keep_last(1));
     } else {
-        camera_pub_ = image_transport::create_camera_publisher(this, "camera/image_raw");
+        camera_pub_ = image_transport::create_camera_publisher(
+          this, "camera/image_raw", rclcpp::SensorDataQoS().keep_last(1).get_rmw_qos_profile());
     }
 
     return true;
