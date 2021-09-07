@@ -13,8 +13,8 @@ extern "C"{
 
 #include <rclcpp/rclcpp.hpp>
 
-#include <image_transport/image_transport.h>
-#include <camera_info_manager/camera_info_manager.h>
+#include <image_transport/image_transport.hpp>
+#include <camera_info_manager/camera_info_manager.hpp>
 
 
 #include <sensor_msgs/msg/image.hpp>
@@ -23,7 +23,7 @@ extern "C"{
 #include <sensor_msgs/srv/set_camera_info.hpp>
 #include <sensor_msgs/image_encodings.hpp>
 
-#include <camera_calibration_parsers/parse_ini.h>
+#include <camera_calibration_parsers/parse_ini.hpp>
 
 #include <gscam/gscam.h>
 
@@ -55,7 +55,7 @@ namespace gscam {
     bool gsconfig_rosparam_defined = false;
     char *gsconfig_env = NULL;
 
-    declare_parameter("gscam_config");
+    declare_parameter<std::string>("gscam_config");
     gsconfig_rosparam_defined = get_parameter("gscam_config",gsconfig_rosparam);
     gsconfig_env = getenv("GSCAM_CONFIG");
 
@@ -110,7 +110,7 @@ namespace gscam {
     }
 
     // Get TF Frame
-    declare_parameter("frame_id");
+    declare_parameter<std::string>("frame_id");
     if(!get_parameter("frame_id",frame_id_)){
       frame_id_ = "/camera_frame";
       RCLCPP_WARN_STREAM(get_logger(), "No camera frame_id set, using frame \""<<frame_id_<<"\".");
