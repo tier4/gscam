@@ -46,6 +46,5 @@ rclcpp_components_register_node(gscam
 )
 
 ament_auto_package(
-  INSTALL_TO_SHARE
-    launch
+  INSTALL_TO_SHARE    
 )
