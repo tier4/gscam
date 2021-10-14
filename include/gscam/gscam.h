@@ -30,6 +30,7 @@ namespace gscam {
     bool init_stream();
     void publish_stream();
     void cleanup_stream();
+    static void triggering(std::shared_ptr<rclcpp::Node> node_ptr, double frame_rate, double phase, int gpio_pin);
 
     void run();
 
@@ -52,6 +53,12 @@ namespace gscam {
     std::string image_encoding_;
     std::string camera_name_;
     std::string camera_info_url_;
+
+    // Triggering configuration
+    double frame_rate_;
+    double phase_;
+    int gpio_;
+    bool use_triggering_;
 
     // ROS Inteface
     // Calibration between ros::Time and gst timestamps

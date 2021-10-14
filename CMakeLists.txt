@@ -24,6 +24,7 @@ ament_auto_find_build_dependencies()
 
 ament_auto_add_library(gscam SHARED
   src/gscam.cpp
+  src/jetson_gpio.cpp
 )
 
 target_include_directories(gscam
@@ -46,5 +47,5 @@ rclcpp_components_register_node(gscam
 
 ament_auto_package(
   INSTALL_TO_SHARE
-    examples
+    launch
 )
