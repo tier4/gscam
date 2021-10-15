@@ -24,7 +24,7 @@ static std::map<int, int> pin_gpio_mapping {
   {51, 408},
   {52, 350},
   {53, 446},
-  {53, 445}
+  {54, 445}
 };
 
 int export_gpio(int gpio);
