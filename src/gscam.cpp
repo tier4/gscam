@@ -262,8 +262,8 @@ namespace gscam {
           rclcpp::SensorDataQoS().keep_last(1));
     } else {
         camera_pub_ = image_transport::create_camera_publisher(
-          // this, "camera/image_raw", rclcpp::SensorDataQoS().keep_last(1).get_rmw_qos_profile());
-          this, "camera/image_raw", rmw_qos_profile_default);
+          this, "camera/image_raw", rclcpp::SensorDataQoS().keep_last(1).get_rmw_qos_profile());
+          //this, "camera/image_raw", rmw_qos_profile_default);
     }
 
     return true;
