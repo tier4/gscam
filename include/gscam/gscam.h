@@ -62,7 +62,9 @@ namespace gscam {
 
     // ROS Inteface
     // Calibration between ros::Time and gst timestamps
-    double time_offset_;
+    double gst_time_offset_;
+    // Offset from shutter to receive in gst
+    double recv_time_offset_;
     camera_info_manager::CameraInfoManager camera_info_manager_;
     image_transport::CameraPublisher camera_pub_;
     // Case of a jpeg only publisher
