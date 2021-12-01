@@ -83,6 +83,8 @@ namespace gscam {
     get_parameter("preroll", preroll_);
     declare_parameter("use_gst_timestamps", false);
     get_parameter("use_gst_timestamps", use_gst_timestamps_);
+    declare_parameter("recv_time_offset", 0.0);
+    get_parameter("recv_time_offset", recv_time_offset_);
 
     declare_parameter("reopen_on_eof", false);
     get_parameter("reopen_on_eof", reopen_on_eof_);
@@ -242,8 +244,8 @@ namespace gscam {
     GstClock * clock = gst_system_clock_obtain();
     GstClockTime ct = gst_clock_get_time(clock);
     gst_object_unref(clock);
-    time_offset_ = now().seconds() - GST_TIME_AS_USECONDS(ct)/1e6;
-    RCLCPP_INFO(get_logger(), "Time offset: %.3f",time_offset_);
+    gst_time_offset_ = now().seconds() - GST_TIME_AS_USECONDS(ct)/1e6;
+    RCLCPP_INFO(get_logger(), "Time offset: %.3f",gst_time_offset_);
 
     gst_element_set_state(pipeline_, GST_STATE_PAUSED);
 
@@ -328,7 +330,7 @@ namespace gscam {
 #endif
       GstClockTime bt = gst_element_get_base_time(pipeline_);
       // RCLCPP_INFO(get_logger(), "New buffer: timestamp %.6f %lu %lu %.3f",
-      //         GST_TIME_AS_USECONDS(buf->timestamp+bt)/1e6+time_offset_, buf->timestamp, bt, time_offset_);
+      //         GST_TIME_AS_USECONDS(buf->timestamp+bt)/1e6+gst_time_offset_, buf->timestamp, bt, gst_time_offset_);
 
 
 #if 0
@@ -366,12 +368,12 @@ namespace gscam {
       cinfo.reset(new sensor_msgs::msg::CameraInfo(cur_cinfo));
       if (use_gst_timestamps_) {
 #if (GST_VERSION_MAJOR == 1)
-          cinfo->header.stamp = rclcpp::Time(GST_TIME_AS_USECONDS(buf->pts+bt)/1e6+time_offset_);
+          cinfo->header.stamp = rclcpp::Time(GST_TIME_AS_USECONDS(buf->pts+bt)/1e6+gst_time_offset_) - rclcpp::Duration(recv_time_offset_);
 #else
-          cinfo->header.stamp = rclcpp::Time(GST_TIME_AS_USECONDS(buf->timestamp+bt)/1e6+time_offset_);
+          cinfo->header.stamp = rclcpp::Time(GST_TIME_AS_USECONDS(buf->timestamp+bt)/1e6+gst_time_offset_) - rclcpp::Duration(recv_time_offset_);
 #endif
       } else {
-          cinfo->header.stamp = now();
+          cinfo->header.stamp = now() - rclcpp::Duration(recv_time_offset_);
       }
       // RCLCPP_INFO(get_logger(), "Image time stamp: %.3f",cinfo->header.stamp.toSec());
       cinfo->header.frame_id = frame_id_;
