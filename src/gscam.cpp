@@ -368,12 +368,12 @@ namespace gscam {
       cinfo.reset(new sensor_msgs::msg::CameraInfo(cur_cinfo));
       if (use_gst_timestamps_) {
 #if (GST_VERSION_MAJOR == 1)
-          cinfo->header.stamp = rclcpp::Time(GST_TIME_AS_USECONDS(buf->pts+bt)/1e6+gst_time_offset_) - rclcpp::Duration(recv_time_offset_/1e-9);
+          cinfo->header.stamp = rclcpp::Time(GST_TIME_AS_USECONDS(buf->pts+bt)/1e6+gst_time_offset_) - rclcpp::Duration::from_seconds(recv_time_offset_);
 #else
-          cinfo->header.stamp = rclcpp::Time(GST_TIME_AS_USECONDS(buf->timestamp+bt)/1e6+gst_time_offset_) - rclcpp::Duration(recv_time_offset_/1e-9);
+          cinfo->header.stamp = rclcpp::Time(GST_TIME_AS_USECONDS(buf->timestamp+bt)/1e6+gst_time_offset_) - rclcpp::Duration::from_seconds(recv_time_offset_);
 #endif
       } else {
-          cinfo->header.stamp = now() - rclcpp::Duration(recv_time_offset_/1e-9);
+          cinfo->header.stamp = now() - rclcpp::Duration::from_seconds(recv_time_offset_);
       }
       // RCLCPP_INFO(get_logger(), "Image time stamp: %.3f",cinfo->header.stamp.toSec());
       cinfo->header.frame_id = frame_id_;
