@@ -299,7 +299,6 @@ void GSCam::publish_stream()
 
   // Poll the data as fast a spossible
   while (!stop_signal_ && rclcpp::ok()) {
-
     // First update the calibration between ros::Time and gst timestamps
     // Note that this is only really for when PTP is used
     GstClock * clock = gst_system_clock_obtain();
