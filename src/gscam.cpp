@@ -299,6 +299,14 @@ void GSCam::publish_stream()
 
   // Poll the data as fast a spossible
   while (!stop_signal_ && rclcpp::ok()) {
+
+    // First update the calibration between ros::Time and gst timestamps
+    // Note that this is only really for when PTP is used
+    GstClock * clock = gst_system_clock_obtain();
+    GstClockTime ct = gst_clock_get_time(clock);
+    gst_object_unref(clock);
+    time_offset_ = now().nanoseconds() - GST_TIME_AS_NSECONDS(ct);
+
     // This should block until a new frame is awake, this way, we'll run at the
     // actual capture framerate of the device.
     // RCLCPP_DEBUG(get_logger(), "Getting data...");
