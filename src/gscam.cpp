@@ -97,6 +97,8 @@ bool GSCam::configure()
   sync_sink_ = declare_parameter("sync_sink", true);
   preroll_ = declare_parameter("preroll", false);
   use_gst_timestamps_ = declare_parameter("use_gst_timestamps", false);
+  base_offset_ = declare_parameter("base_timestamp_offset", 0);
+  tunable_offset_ = declare_parameter("tuneable_timestamp_offset", 0);
 
   reopen_on_eof_ = declare_parameter("reopen_on_eof", false);
 
@@ -135,6 +137,10 @@ bool GSCam::configure()
   }
 
   use_sensor_data_qos_ = declare_parameter("use_sensor_data_qos", false);
+
+  // Parameter reconfigure
+  set_parameters_ = this->add_on_set_parameters_callback(
+    std::bind(&GSCam::onParameter, this, std::placeholders::_1));
 
   return true;
 }
@@ -360,7 +366,7 @@ void GSCam::publish_stream()
     sensor_msgs::msg::CameraInfo::SharedPtr cinfo;
     cinfo.reset(new sensor_msgs::msg::CameraInfo(cur_cinfo));
     if (use_gst_timestamps_) {
-      cinfo->header.stamp = rclcpp::Time(GST_TIME_AS_NSECONDS(buf->pts + bt) + time_offset_);
+      cinfo->header.stamp = rclcpp::Time(GST_TIME_AS_NSECONDS(buf->pts + bt) + time_offset_ + base_offset_ + tunable_offset_);
     } else {
       cinfo->header.stamp = now();
     }
@@ -431,6 +437,20 @@ void GSCam::cleanup_stream()
     gst_element_set_state(pipeline_, GST_STATE_NULL);
     gst_object_unref(pipeline_);
     pipeline_ = NULL;
+  }
+}
+
+rcl_interfaces::msg::SetParametersResult GSCam::onParameter(
+  const std::vector<rclcpp::Parameter>& parameters)
+{
+  rcl_interfaces::msg::SetParametersResult result;
+  result.successful = true;
+  result.reason = "success";
+  for (const auto &param: parameters) {
+    if (param.get_name() == "tuneable_timestamp_offset") {
+      tunable_offset_ = param.as_int();
+    }
+    return result;
   }
 }
 

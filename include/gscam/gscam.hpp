@@ -24,6 +24,7 @@ extern "C" {
 }
 
 #include "rclcpp/rclcpp.hpp"
+#include "rcl_interfaces/msg/set_parameters_result.hpp"
 
 #include "image_transport/image_transport.hpp"
 #include "camera_info_manager/camera_info_manager.hpp"
@@ -74,6 +75,8 @@ private:
   // ROS Inteface
   // Calibration between ros::Time and gst timestamps
   uint64_t time_offset_;
+  int64_t base_offset_;
+  int64_t tunable_offset_;
   camera_info_manager::CameraInfoManager camera_info_manager_;
   image_transport::CameraPublisher camera_pub_;
   // Case of a jpeg only publisher
@@ -83,6 +86,10 @@ private:
   // Poll gstreamer on a separate thread
   std::thread pipeline_thread_;
   std::atomic<bool> stop_signal_;
+
+  // Dynamic parameter callback
+  OnSetParametersCallbackHandle::SharedPtr set_parameters_;
+  rcl_interfaces::msg::SetParametersResult onParameter(const std::vector<rclcpp::Parameter> & parameters);
 };
 
 }  // namespace gscam
